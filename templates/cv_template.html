@@ -3,537 +3,394 @@
 <head>
 <meta charset="UTF-8">
 <style>
-/* ── Reset & base ─────────────────────────────────────────── */
-* { box-sizing: border-box; margin: 0; padding: 0; }
+
+@page {
+    size: A4;
+    margin: 1.8cm 1.8cm 1.5cm 1.8cm;
+}
 
 body {
-  font-family: 'Liberation Sans', 'DejaVu Sans', Arial, sans-serif;
-  font-size: 10pt;
-  color: #1a1a1a;
-  line-height: 1.45;
-  background: #fff;
+    font-family: "DejaVu Sans", Arial, sans-serif;
+    font-size: 9.5pt;
+    color: #111111;
+    line-height: 1.45;
+    background: #ffffff;
 }
 
-/* ── Layout : sidebar gauche + contenu principal ─────────── */
-.layout {
-  display: grid;
-  grid-template-columns: 195px 1fr;
-  min-height: 100%;
+/* ── En-tête ─────────────────────────────────────────── */
+.header {
+    border-bottom: 2px solid #111111;
+    padding-bottom: 8px;
+    margin-bottom: 14px;
 }
 
-/* ── Sidebar ─────────────────────────────────────────────── */
-.sidebar {
-  background: #1e2a3a;
-  color: #e8edf2;
-  padding: 28px 16px 20px;
-  page-break-inside: avoid;
+.header-name {
+    font-size: 18pt;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-.sidebar h1 {
-  font-size: 15pt;
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1.2;
-  margin-bottom: 2px;
+.header-titre {
+    font-size: 10pt;
+    color: #444444;
+    margin-top: 2px;
 }
 
-.sidebar .titre-poste {
-  font-size: 9pt;
-  color: #7eb8e0;
-  margin-bottom: 20px;
-  font-style: italic;
-  line-height: 1.3;
+.header-contact {
+    font-size: 8pt;
+    color: #444444;
+    margin-top: 6px;
 }
 
-/* Sections sidebar */
-.sidebar-section { margin-bottom: 18px; }
-
-.sidebar-section h2 {
-  font-size: 8pt;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: #7eb8e0;
-  border-bottom: 1px solid #2e4060;
-  padding-bottom: 4px;
-  margin-bottom: 8px;
-  font-weight: 600;
+.header-contact-sep {
+    margin: 0 6px;
+    color: #aaaaaa;
 }
 
-/* Infos de contact */
-.contact-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  margin-bottom: 5px;
-  font-size: 8.5pt;
-  word-break: break-word;
+/* ── Sections ─────────────────────────────────────────── */
+.section {
+    margin-bottom: 14px;
 }
 
-.contact-item .icon {
-  min-width: 14px;
-  font-size: 9pt;
-  color: #7eb8e0;
+.section-title {
+    font-size: 9pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border-bottom: 1px solid #cccccc;
+    padding-bottom: 2px;
+    margin-bottom: 8px;
+    color: #111111;
 }
 
-/* Compétences */
-.comp-categorie { margin-bottom: 8px; }
-
-.comp-categorie-nom {
-  font-size: 7.5pt;
-  font-weight: 600;
-  color: #b0c8de;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 3px;
+/* ── Résumé ───────────────────────────────────────────── */
+.resume {
+    font-size: 9pt;
+    color: #222222;
+    font-style: italic;
+    line-height: 1.55;
+    margin-bottom: 14px;
+    padding-left: 4px;
+    border-left: 2px solid #cccccc;
+    padding-left: 10px;
 }
 
-.comp-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px;
-}
-
-.comp-tag {
-  background: #2e4060;
-  color: #c8dced;
-  border-radius: 3px;
-  padding: 1px 6px;
-  font-size: 7.5pt;
-}
-
-/* Langues */
-.langue-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 8.5pt;
-  margin-bottom: 4px;
-}
-
-.langue-niveau {
-  font-size: 7.5pt;
-  color: #7eb8e0;
-  background: #2e4060;
-  border-radius: 3px;
-  padding: 1px 5px;
-}
-
-/* Certifications sidebar */
-.certif-item {
-  font-size: 8pt;
-  margin-bottom: 6px;
-  line-height: 1.4;
-}
-
-.certif-nom { color: #e8edf2; font-weight: 600; }
-.certif-org { color: #9ab5cc; font-size: 7.5pt; }
-
-/* ── Contenu principal ───────────────────────────────────── */
-.main {
-  padding: 28px 22px 20px;
-}
-
-/* Résumé */
-.section-resume {
-  background: #f0f5fa;
-  border-left: 3px solid #1e6fa8;
-  padding: 10px 14px;
-  margin-bottom: 20px;
-  border-radius: 0 4px 4px 0;
-}
-
-.section-resume p {
-  font-size: 9.5pt;
-  color: #2a3a4a;
-  line-height: 1.55;
-  font-style: italic;
-}
-
-/* Titres de sections */
-.section { margin-bottom: 18px; }
-
-.section-titre {
-  font-size: 10pt;
-  font-weight: 700;
-  color: #1e2a3a;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border-bottom: 2px solid #1e6fa8;
-  padding-bottom: 3px;
-  margin-bottom: 10px;
-}
-
-/* Blocs expérience / formation */
+/* ── Blocs expérience / formation ─────────────────────── */
 .bloc {
-  margin-bottom: 12px;
-  page-break-inside: avoid;
+    margin-bottom: 9px;
 }
 
 .bloc-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 2px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.bloc-header td {
+    padding: 0;
+    vertical-align: top;
 }
 
 .bloc-poste {
-  font-weight: 700;
-  font-size: 10pt;
-  color: #1a1a1a;
-  line-height: 1.3;
+    font-size: 9.5pt;
+    font-weight: bold;
+    color: #111111;
+}
+
+.bloc-badge {
+    font-size: 7.5pt;
+    color: #555555;
+    border: 1px solid #cccccc;
+    padding: 0px 4px;
+    margin-left: 5px;
 }
 
 .bloc-date {
-  font-size: 8pt;
-  color: #5a7a9a;
-  white-space: nowrap;
-  margin-left: 10px;
-  margin-top: 1px;
+    font-size: 8pt;
+    color: #555555;
+    text-align: right;
+    white-space: nowrap;
+    width: 120px;
 }
 
-.bloc-sous-titre {
-  font-size: 9pt;
-  color: #1e6fa8;
-  font-weight: 600;
-  margin-bottom: 4px;
+.bloc-sub {
+    font-size: 9pt;
+    color: #333333;
+    font-weight: bold;
+    margin-top: 1px;
+    margin-bottom: 3px;
 }
 
 .bloc-lieu {
-  font-size: 8.5pt;
-  color: #666;
+    font-size: 8.5pt;
+    color: #666666;
+    font-weight: normal;
 }
 
-.bloc-type {
-  display: inline-block;
-  font-size: 7.5pt;
-  background: #e8f0f8;
-  color: #1e6fa8;
-  border-radius: 3px;
-  padding: 1px 6px;
-  margin-left: 4px;
-  vertical-align: middle;
-}
-
-/* Listes de missions */
 .missions {
-  margin: 5px 0 0 0;
-  padding-left: 15px;
+    margin: 3px 0 0 16px;
+    padding: 0;
 }
 
 .missions li {
-  font-size: 9pt;
-  color: #2a2a2a;
-  margin-bottom: 3px;
-  line-height: 1.45;
+    font-size: 8.5pt;
+    color: #222222;
+    margin-bottom: 2px;
+    line-height: 1.4;
 }
 
-/* Tags technos dans exp */
-.tech-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px;
-  margin-top: 5px;
+.tech {
+    font-size: 7.5pt;
+    color: #555555;
+    margin-top: 4px;
+    font-style: italic;
 }
 
-.tech-tag {
-  font-size: 7.5pt;
-  background: #eef3f8;
-  color: #2a5070;
-  border: 1px solid #ccdae8;
-  border-radius: 3px;
-  padding: 1px 6px;
+/* ── Compétences : grille texte ───────────────────────── */
+.comp-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-/* Projets */
-.projet-bloc {
-  margin-bottom: 10px;
-  padding: 8px 10px;
-  background: #fafbfc;
-  border: 1px solid #e0e8ef;
-  border-radius: 4px;
-  page-break-inside: avoid;
+.comp-table td {
+    vertical-align: top;
+    padding: 1px 6px 4px 0;
+    width: 50%;
+}
+
+.comp-cat {
+    font-size: 8pt;
+    font-weight: bold;
+    color: #333333;
+}
+
+.comp-items {
+    font-size: 8pt;
+    color: #222222;
+}
+
+/* ── Projets ──────────────────────────────────────────── */
+.projet {
+    margin-bottom: 7px;
 }
 
 .projet-nom {
-  font-weight: 700;
-  font-size: 9.5pt;
-  color: #1a1a1a;
+    font-size: 9pt;
+    font-weight: bold;
+    color: #111111;
 }
 
 .projet-lien {
-  font-size: 7.5pt;
-  color: #1e6fa8;
-  margin-left: 6px;
+    font-size: 7.5pt;
+    color: #555555;
+    margin-left: 8px;
 }
 
 .projet-desc {
-  font-size: 8.5pt;
-  color: #333;
-  margin-top: 3px;
-  line-height: 1.45;
+    font-size: 8.5pt;
+    color: #333333;
+    margin-top: 2px;
+    line-height: 1.4;
 }
 
-/* Centres d'intérêt */
-.interets {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+/* ── Certifications & Langues : inline ────────────────── */
+.inline-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.interet-tag {
-  background: #f0f5fa;
-  color: #2a4a6a;
-  border-radius: 3px;
-  padding: 3px 10px;
-  font-size: 9pt;
+.inline-table td {
+    vertical-align: top;
+    padding: 1px 12px 2px 0;
+    font-size: 8.5pt;
 }
 
-/* ── Utilitaires ─────────────────────────────────────────── */
-.empty { display: none; }
+.certif-nom {
+    font-weight: bold;
+    color: #111111;
+}
+
+.certif-org {
+    color: #555555;
+    font-size: 8pt;
+}
+
 </style>
 </head>
 <body>
 
-<div class="layout">
-
-  <!-- ══════════════════ SIDEBAR ══════════════════ -->
-  <aside class="sidebar">
-
-    <!-- Nom & titre -->
-    <h1>{{ cv.identite.prenom }}<br>{{ cv.identite.nom }}</h1>
-    <p class="titre-poste">{{ cv.identite.titre }}</p>
-
-    <!-- Contact -->
-    <div class="sidebar-section">
-      <h2>Contact</h2>
-      {% if cv.identite.email %}
-      <div class="contact-item">
-        <span class="icon">✉</span>
-        <span>{{ cv.identite.email }}</span>
-      </div>
-      {% endif %}
-      {% if cv.identite.telephone %}
-      <div class="contact-item">
-        <span class="icon">☎</span>
-        <span>{{ cv.identite.telephone }}</span>
-      </div>
-      {% endif %}
-      {% if cv.identite.localisation %}
-      <div class="contact-item">
-        <span class="icon">◎</span>
-        <span>{{ cv.identite.localisation }}</span>
-      </div>
-      {% endif %}
-      {% if cv.identite.linkedin %}
-      <div class="contact-item">
-        <span class="icon">in</span>
-        <span>{{ cv.identite.linkedin }}</span>
-      </div>
-      {% endif %}
-      {% if cv.identite.github %}
-      <div class="contact-item">
-        <span class="icon">⌥</span>
-        <span>{{ cv.identite.github }}</span>
-      </div>
-      {% endif %}
-      {% if cv.identite.portfolio %}
-      <div class="contact-item">
-        <span class="icon">⬡</span>
-        <span>{{ cv.identite.portfolio }}</span>
-      </div>
-      {% endif %}
+<!-- ══════════ EN-TÊTE ══════════ -->
+<div class="header">
+    <div class="header-name">{{ cv.identite.prenom }} {{ cv.identite.nom }}</div>
+    <div class="header-titre">{{ cv.identite.titre }}</div>
+    <div class="header-contact">
+        {% if cv.identite.email %}{{ cv.identite.email }}{% endif %}
+        {% if cv.identite.telephone %}<span class="header-contact-sep">|</span>{{ cv.identite.telephone }}{% endif %}
+        {% if cv.identite.localisation %}<span class="header-contact-sep">|</span>{{ cv.identite.localisation }}{% endif %}
+        {% if cv.identite.linkedin %}<span class="header-contact-sep">|</span>{{ cv.identite.linkedin }}{% endif %}
+        {% if cv.identite.github %}<span class="header-contact-sep">|</span>{{ cv.identite.github }}{% endif %}
+        {% if cv.identite.portfolio %}<span class="header-contact-sep">|</span>{{ cv.identite.portfolio }}{% endif %}
     </div>
+</div>
 
-    <!-- Compétences -->
-    {% if cv.competences %}
-    <div class="sidebar-section">
-      <h2>Compétences</h2>
+<!-- ══════════ RÉSUMÉ ══════════ -->
+{% if cv.resume %}
+<div class="resume">{{ cv.resume }}</div>
+{% endif %}
 
-      {% set comp_map = [
-        ("langages",       "Langages"),
-        ("frameworks",     "Frameworks"),
-        ("outils",         "Outils"),
-        ("bases_de_donnees","Bases de données"),
-        ("cloud",          "Cloud"),
-        ("methodologies",  "Méthodo."),
-        ("autres",         "Autres"),
-      ] %}
+<!-- ══════════ EXPÉRIENCES ══════════ -->
+{% if cv.experiences %}
+<div class="section">
+    <div class="section-title">Expériences professionnelles</div>
 
-      {% for key, label in comp_map %}
-        {% set items = cv.competences.get(key, []) %}
-        {% if items %}
-        <div class="comp-categorie">
-          <div class="comp-categorie-nom">{{ label }}</div>
-          <div class="comp-tags">
-            {% for item in items %}
-            <span class="comp-tag">{{ item }}</span>
-            {% endfor %}
-          </div>
-        </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    <!-- Langues -->
-    {% if cv.langues %}
-    <div class="sidebar-section">
-      <h2>Langues</h2>
-      {% for l in cv.langues %}
-      <div class="langue-item">
-        <span>{{ l.langue }}</span>
-        <span class="langue-niveau">{{ l.niveau }}</span>
-      </div>
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    <!-- Certifications -->
-    {% if cv.certifications %}
-    <div class="sidebar-section">
-      <h2>Certifications</h2>
-      {% for c in cv.certifications %}
-      <div class="certif-item">
-        <div class="certif-nom">{{ c.nom }}</div>
-        <div class="certif-org">{{ c.organisme }}{% if c.date %} · {{ c.date }}{% endif %}</div>
-      </div>
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    <!-- Centres d'intérêt (sidebar si peu d'espace) -->
-    {% if cv.centres_interet and cv.centres_interet|length <= 4 %}
-    <div class="sidebar-section">
-      <h2>Intérêts</h2>
-      {% for ci in cv.centres_interet %}
-      <div style="font-size:8.5pt; margin-bottom:3px; color:#c8dced;">• {{ ci }}</div>
-      {% endfor %}
-    </div>
-    {% endif %}
-
-  </aside>
-
-  <!-- ══════════════════ MAIN ══════════════════ -->
-  <main class="main">
-
-    <!-- Résumé -->
-    {% if cv.resume %}
-    <div class="section-resume">
-      <p>{{ cv.resume }}</p>
-    </div>
-    {% endif %}
-
-    <!-- Expériences -->
-    {% if cv.experiences %}
-    <div class="section">
-      <div class="section-titre">Expériences professionnelles</div>
-
-      {% for exp in cv.experiences %}
-      <div class="bloc">
-        <div class="bloc-header">
-          <div>
-            <span class="bloc-poste">{{ exp.poste }}</span>
-            {% if exp.type %}
-            <span class="bloc-type">{{ exp.type }}</span>
-            {% endif %}
-          </div>
-          <div class="bloc-date">
-            {{ exp.date_debut }}{% if exp.date_fin %} – {{ exp.date_fin }}{% endif %}
-          </div>
-        </div>
-        <div class="bloc-sous-titre">
-          {{ exp.entreprise }}{% if exp.lieu %} <span class="bloc-lieu">· {{ exp.lieu }}</span>{% endif %}
+    {% for exp in cv.experiences %}
+    <div class="bloc">
+        <table class="bloc-header">
+            <tr>
+                <td>
+                    <span class="bloc-poste">{{ exp.poste }}</span>
+                    {% if exp.type %}<span class="bloc-badge">{{ exp.type }}</span>{% endif %}
+                </td>
+                <td class="bloc-date">
+                    {{ exp.date_debut }}{% if exp.date_fin %} – {{ exp.date_fin }}{% endif %}
+                </td>
+            </tr>
+        </table>
+        <div class="bloc-sub">
+            {{ exp.entreprise }}
+            {% if exp.lieu %}<span class="bloc-lieu"> · {{ exp.lieu }}</span>{% endif %}
         </div>
         {% if exp.missions %}
         <ul class="missions">
-          {% for m in exp.missions %}
-          <li>{{ m }}</li>
-          {% endfor %}
+            {% for m in exp.missions %}<li>{{ m }}</li>{% endfor %}
         </ul>
         {% endif %}
         {% if exp.technologies %}
-        <div class="tech-tags">
-          {% for t in exp.technologies %}
-          <span class="tech-tag">{{ t }}</span>
-          {% endfor %}
-        </div>
+        <div class="tech">{{ exp.technologies | join(' · ') }}</div>
         {% endif %}
-      </div>
-      {% endfor %}
     </div>
-    {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
 
-    <!-- Formations -->
-    {% if cv.formations %}
-    <div class="section">
-      <div class="section-titre">Formation</div>
+<!-- ══════════ FORMATION ══════════ -->
+{% if cv.formations %}
+<div class="section">
+    <div class="section-title">Formation</div>
 
-      {% for f in cv.formations %}
-      <div class="bloc">
-        <div class="bloc-header">
-          <div class="bloc-poste">{{ f.diplome }}</div>
-          <div class="bloc-date">
-            {{ f.date_debut }}{% if f.date_fin %} – {{ f.date_fin }}{% endif %}
-          </div>
-        </div>
-        <div class="bloc-sous-titre">
-          {{ f.etablissement }}{% if f.lieu %} <span class="bloc-lieu">· {{ f.lieu }}</span>{% endif %}
-          {% if f.mention %} <span class="bloc-type">{{ f.mention }}</span>{% endif %}
+    {% for f in cv.formations %}
+    <div class="bloc">
+        <table class="bloc-header">
+            <tr>
+                <td class="bloc-poste">{{ f.diplome }}</td>
+                <td class="bloc-date">{{ f.date_debut }}{% if f.date_fin %} – {{ f.date_fin }}{% endif %}</td>
+            </tr>
+        </table>
+        <div class="bloc-sub">
+            {{ f.etablissement }}
+            {% if f.lieu %}<span class="bloc-lieu"> · {{ f.lieu }}</span>{% endif %}
+            {% if f.mention %}<span class="bloc-badge">{{ f.mention }}</span>{% endif %}
         </div>
         {% if f.details %}
         <ul class="missions">
-          {% for d in f.details %}
-          <li>{{ d }}</li>
-          {% endfor %}
+            {% for d in f.details %}<li>{{ d }}</li>{% endfor %}
         </ul>
         {% endif %}
-      </div>
-      {% endfor %}
     </div>
-    {% endif %}
-
-    <!-- Projets -->
-    {% if cv.projets %}
-    <div class="section">
-      <div class="section-titre">Projets</div>
-
-      {% for p in cv.projets %}
-      <div class="projet-bloc">
-        <div>
-          <span class="projet-nom">{{ p.nom }}</span>
-          {% if p.lien %}
-          <span class="projet-lien">{{ p.lien }}</span>
-          {% endif %}
-        </div>
-        {% if p.description %}
-        <div class="projet-desc">{{ p.description }}</div>
-        {% endif %}
-        {% if p.technologies %}
-        <div class="tech-tags" style="margin-top:4px;">
-          {% for t in p.technologies %}
-          <span class="tech-tag">{{ t }}</span>
-          {% endfor %}
-        </div>
-        {% endif %}
-      </div>
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    <!-- Centres d'intérêt (main si nombreux) -->
-    {% if cv.centres_interet and cv.centres_interet|length > 4 %}
-    <div class="section">
-      <div class="section-titre">Centres d'intérêt</div>
-      <div class="interets">
-        {% for ci in cv.centres_interet %}
-        <span class="interet-tag">{{ ci }}</span>
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %}
-
-  </main>
+    {% endfor %}
 </div>
+{% endif %}
+
+<!-- ══════════ COMPÉTENCES ══════════ -->
+{% if cv.competences %}
+<div class="section">
+    <div class="section-title">Compétences</div>
+
+    {% set comp_map = [
+        ("langages",        "Langages"),
+        ("frameworks",      "Frameworks & Librairies"),
+        ("outils",          "Outils"),
+        ("bases_de_donnees","Bases de données"),
+        ("cloud",           "Cloud"),
+        ("methodologies",   "Méthodologies"),
+        ("autres",          "IA / ML"),
+    ] %}
+
+    <table class="comp-table">
+    {% set ns = namespace(col=0) %}
+    {% for key, label in comp_map %}
+        {% set items = cv.competences.get(key, []) %}
+        {% if items %}
+            {% if ns.col == 0 %}<tr>{% endif %}
+            <td>
+                <span class="comp-cat">{{ label }} : </span>
+                <span class="comp-items">{{ items | join(', ') }}</span>
+            </td>
+            {% set ns.col = ns.col + 1 %}
+            {% if ns.col == 2 %}</tr>{% set ns.col = 0 %}{% endif %}
+        {% endif %}
+    {% endfor %}
+    {% if ns.col == 1 %}<td></td></tr>{% endif %}
+    </table>
+</div>
+{% endif %}
+
+<!-- ══════════ PROJETS ══════════ -->
+{% if cv.projets %}
+<div class="section">
+    <div class="section-title">Projets &amp; Hackathons</div>
+
+    {% for p in cv.projets %}
+    <div class="projet">
+        <span class="projet-nom">{{ p.nom }}</span>
+        {% if p.lien %}<span class="projet-lien">{{ p.lien }}</span>{% endif %}
+        {% if p.description %}<div class="projet-desc">{{ p.description }}</div>{% endif %}
+        {% if p.technologies %}<div class="tech">{{ p.technologies | join(' · ') }}</div>{% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- ══════════ CERTIFICATIONS ══════════ -->
+{% if cv.certifications %}
+<div class="section">
+    <div class="section-title">Certifications</div>
+    <table class="inline-table">
+    {% for c in cv.certifications %}
+        {% if loop.index is odd %}<tr>{% endif %}
+        <td>
+            <span class="certif-nom">{{ c.nom }}</span>
+            <span class="certif-org"> — {{ c.organisme }}{% if c.date %}, {{ c.date }}{% endif %}</span>
+        </td>
+        {% if loop.index is even %}</tr>{% endif %}
+    {% endfor %}
+    {% if cv.certifications | length is odd %}<td></td></tr>{% endif %}
+    </table>
+</div>
+{% endif %}
+
+<!-- ══════════ LANGUES ══════════ -->
+{% if cv.langues %}
+<div class="section">
+    <div class="section-title">Langues</div>
+    <table class="inline-table">
+    {% for l in cv.langues %}
+        {% if loop.index is odd %}<tr>{% endif %}
+        <td><span class="certif-nom">{{ l.langue }}</span> — {{ l.niveau }}</td>
+        {% if loop.index is even %}</tr>{% endif %}
+    {% endfor %}
+    {% if cv.langues | length is odd %}<td></td></tr>{% endif %}
+    </table>
+</div>
+{% endif %}
+
+<!-- ══════════ INTÉRÊTS ══════════ -->
+{% if cv.centres_interet %}
+<div class="section">
+    <div class="section-title">Centres d'intérêt</div>
+    <div style="font-size:8.5pt; color:#333333;">{{ cv.centres_interet | join('   ·   ') }}</div>
+</div>
+{% endif %}
 
 </body>
 </html>
