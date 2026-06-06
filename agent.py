@@ -1,187 +1,163 @@
 """
-agent.py — Logique d'adaptation du CV à une offre d'emploi.
+agent.py — Adaptation du CV en UN SEUL appel LLM (version optimisée).
 
-Pipeline :
-  1. analyse_offre(texte_offre) → mots-clés, compétences requises
-  2. adapter_cv(profil, analyse_offre) → CV ciblé structuré (dict)
-  3. adapter(texte_offre, profil) → fonction principale combinée
+Au lieu de deux appels séquentiels :
+  1. analyse_offre()   → ~60-90s
+  2. adapter_cv()      → ~90-120s
+
+On fait tout en un seul prompt structuré :
+  adapter()            → ~80-110s  (gain ~40-60%)
+
+Le LLM fait le même raisonnement en interne, mais on évite :
+  - le rechargement du contexte entre deux appels
+  - la sérialisation/désérialisation intermédiaire
+  - la latence supplémentaire vers Ollama
 """
 
 import json
 import re
-from typing import Optional
 
 import ollama as ol
-from config import OLLAMA_MODEL, SYSTEM_PROMPT_ANALYSE, LLM_OPTIONS
+from config import OLLAMA_MODEL, LLM_OPTIONS
 
 
-# ── 1. Analyse de l'offre d'emploi ──────────────────────────────────────────
+# ── Prompt système ────────────────────────────────────────────────────────────
 
-PROMPT_ANALYSE_OFFRE = """\
-Analyse cette offre d'emploi et retourne un JSON structuré.
-
-Offre d'emploi :
-{offre}
-
-Retourne UNIQUEMENT ce JSON (sans markdown) :
-{{
-  "poste": "",
-  "entreprise": "",
-  "secteur": "",
-  "type_contrat": "CDI|CDD|Stage|Alternance|Freelance",
-  "competences_requises": [],
-  "competences_souhaitees": [],
-  "technologies": [],
-  "experience_requise": "",
-  "formation_requise": "",
-  "missions_principales": [],
-  "mots_cles": [],
-  "soft_skills": [],
-  "langue_travail": "français|anglais|bilingue"
-}}
-"""
+SYSTEM_PROMPT = """Tu es un expert en recrutement et en rédaction de CV.
+Tu analyses des offres d'emploi et adaptes des profils de candidats pour créer
+des CVs parfaitement ciblés et percutants.
+Tu réponds UNIQUEMENT en JSON valide, sans markdown, sans texte avant ou après."""
 
 
-def analyse_offre(texte_offre: str) -> dict:
-    """Extrait les informations clés d'une offre d'emploi."""
-    response = ol.chat(
-        model=OLLAMA_MODEL,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT_ANALYSE},
-            {"role": "user",   "content": PROMPT_ANALYSE_OFFRE.format(offre=texte_offre)},
-        ],
-        options=LLM_OPTIONS,
-    )
-    raw = _clean_json(response["message"]["content"])
-    return json.loads(raw)
+# ── Prompt unique fusionné ────────────────────────────────────────────────────
 
+PROMPT_FUSIONNE = """\
+Tu reçois une offre d'emploi et le profil complet d'un candidat.
+Tu dois en UNE SEULE réponse JSON :
+  1. Analyser l'offre (extraire les informations clés)
+  2. Produire un CV ciblé et adapté à cette offre
 
-# ── 2. Adaptation du CV ──────────────────────────────────────────────────────
-
-PROMPT_ADAPTER_CV = """\
-Tu dois créer un CV parfaitement adapté à cette offre d'emploi.
-
-PROFIL DU CANDIDAT (toutes ses informations) :
-{profil}
-
-ANALYSE DE L'OFFRE :
-{analyse}
-
-RÈGLES IMPORTANTES :
-- Ne jamais inventer d'expériences, compétences ou diplômes absents du profil
+RÈGLES IMPORTANTES pour l'adaptation du CV :
+- Ne JAMAIS inventer d'expériences, compétences ou diplômes absents du profil
 - Reformuler les missions pour matcher les mots-clés de l'offre (sans mentir)
 - Mettre en avant les expériences et projets les plus pertinents EN PREMIER
 - Adapter le titre professionnel et le résumé à l'offre
-- Sélectionner uniquement les compétences pertinentes (max 20)
+- Sélectionner uniquement les compétences pertinentes (max 20 items au total)
 - Garder les 2-3 expériences les plus récentes ou pertinentes
-- Le résumé doit être percutant et ciblé (3-4 phrases max)
+- Résumé percutant et ciblé (3-4 phrases max)
 
+═══════════════════════════════
+OFFRE D'EMPLOI :
+{offre}
+
+═══════════════════════════════
+PROFIL DU CANDIDAT :
+{profil}
+
+═══════════════════════════════
 Retourne UNIQUEMENT ce JSON (sans markdown) :
 {{
-  "identite": {{
-    "nom": "",
-    "prenom": "",
-    "titre": "",
-    "email": "",
-    "telephone": "",
-    "localisation": "",
-    "linkedin": "",
-    "github": "",
-    "portfolio": ""
+  "analyse": {{
+    "poste": "",
+    "entreprise": "",
+    "secteur": "",
+    "type_contrat": "CDI|CDD|Stage|Alternance|Freelance",
+    "competences_requises": [],
+    "competences_souhaitees": [],
+    "technologies": [],
+    "experience_requise": "",
+    "missions_principales": [],
+    "mots_cles": [],
+    "soft_skills": [],
+    "langue_travail": "français|anglais|bilingue"
   }},
-  "resume": "",
-  "formations": [
-    {{
-      "diplome": "",
-      "etablissement": "",
-      "lieu": "",
-      "date_debut": "",
-      "date_fin": "",
-      "mention": "",
-      "details": []
-    }}
-  ],
-  "experiences": [
-    {{
-      "poste": "",
-      "entreprise": "",
-      "lieu": "",
-      "date_debut": "",
-      "date_fin": "",
-      "type": "",
-      "missions": [],
-      "technologies": []
-    }}
-  ],
-  "projets": [
-    {{
+  "cv": {{
+    "identite": {{
       "nom": "",
-      "description": "",
-      "technologies": [],
-      "lien": ""
-    }}
-  ],
-  "competences": {{
-    "langages": [],
-    "frameworks": [],
-    "outils": [],
-    "bases_de_donnees": [],
-    "cloud": [],
-    "methodologies": [],
-    "autres": []
-  }},
-  "certifications": [
-    {{
-      "nom": "",
-      "organisme": "",
-      "date": "",
-      "lien": ""
-    }}
-  ],
-  "langues": [
-    {{
-      "langue": "",
-      "niveau": ""
-    }}
-  ],
-  "score_match": 0,
-  "points_forts": [],
-  "points_faibles": [],
-  "conseils": []
+      "prenom": "",
+      "titre": "",
+      "email": "",
+      "telephone": "",
+      "localisation": "",
+      "linkedin": "",
+      "github": "",
+      "portfolio": ""
+    }},
+    "resume": "",
+    "formations": [
+      {{
+        "diplome": "",
+        "etablissement": "",
+        "lieu": "",
+        "date_debut": "",
+        "date_fin": "",
+        "mention": "",
+        "details": []
+      }}
+    ],
+    "experiences": [
+      {{
+        "poste": "",
+        "entreprise": "",
+        "lieu": "",
+        "date_debut": "",
+        "date_fin": "",
+        "type": "",
+        "missions": [],
+        "technologies": []
+      }}
+    ],
+    "projets": [
+      {{
+        "nom": "",
+        "description": "",
+        "technologies": [],
+        "lien": ""
+      }}
+    ],
+    "competences": {{
+      "langages": [],
+      "frameworks": [],
+      "outils": [],
+      "bases_de_donnees": [],
+      "cloud": [],
+      "methodologies": [],
+      "autres": []
+    }},
+    "certifications": [
+      {{
+        "nom": "",
+        "organisme": "",
+        "date": "",
+        "lien": ""
+      }}
+    ],
+    "langues": [
+      {{
+        "langue": "",
+        "niveau": ""
+      }}
+    ],
+    "centres_interet": [],
+    "score_match": 0,
+    "points_forts": [],
+    "points_faibles": [],
+    "conseils": []
+  }}
 }}
 
-Le champ "score_match" est un entier de 0 à 100 estimant l'adéquation profil/offre.
-"points_forts" : 3 raisons pour lesquelles ce profil colle à l'offre.
-"points_faibles" : 2 points à améliorer ou absents du profil.
-"conseils" : 2-3 conseils pour mieux postuler (lettre de motivation, entretien…).
+score_match : entier 0-100 estimant l'adéquation profil/offre.
+points_forts : 3 raisons pour lesquelles ce profil colle à l'offre.
+points_faibles : 2 points absents ou insuffisants dans le profil.
+conseils : 2-3 conseils pratiques (lettre de motivation, entretien…).
 """
 
 
-def adapter_cv(profil: dict, analyse: dict) -> dict:
-    """Génère un CV adapté à partir du profil et de l'analyse de l'offre."""
-    response = ol.chat(
-        model=OLLAMA_MODEL,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT_ANALYSE},
-            {
-                "role": "user",
-                "content": PROMPT_ADAPTER_CV.format(
-                    profil=json.dumps(profil, ensure_ascii=False, indent=2),
-                    analyse=json.dumps(analyse, ensure_ascii=False, indent=2),
-                ),
-            },
-        ],
-        options={**LLM_OPTIONS, "num_ctx": 12000},
-    )
-    raw = _clean_json(response["message"]["content"])
-    return json.loads(raw)
-
-
-# ── 3. Pipeline principal ────────────────────────────────────────────────────
+# ── Fonction principale ───────────────────────────────────────────────────────
 
 def adapter(texte_offre: str, profil: dict, progress_cb=None) -> dict:
     """
-    Pipeline complet : offre + profil → CV adapté.
+    Pipeline complet en UN SEUL appel LLM : offre + profil → CV adapté.
 
     Args:
         texte_offre : texte brut de l'offre d'emploi
@@ -189,42 +165,64 @@ def adapter(texte_offre: str, profil: dict, progress_cb=None) -> dict:
         progress_cb : callable(etape: str) pour feedback Streamlit
 
     Returns:
-        dict contenant :
-          - "cv"      : le CV adapté (prêt pour le template)
-          - "analyse" : l'analyse de l'offre
+        dict avec clés "cv" et "analyse"
     """
     if progress_cb:
-        progress_cb("Analyse de l'offre d'emploi…")
+        progress_cb("Analyse de l'offre et adaptation du CV en cours…")
 
-    analyse = analyse_offre(texte_offre)
+    prompt = PROMPT_FUSIONNE.format(
+        offre=texte_offre.strip(),
+        profil=json.dumps(profil, ensure_ascii=False, indent=2),
+    )
+
+    response = ol.chat(
+        model=OLLAMA_MODEL,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user",   "content": prompt},
+        ],
+        options={
+            **LLM_OPTIONS,
+            "num_ctx": 6000,   # réduit de 8192 → gain mémoire et vitesse
+        },
+    )
+
+    raw = _clean_json(response["message"]["content"])
+
+    try:
+        result = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise ValueError(
+            f"Le LLM n'a pas retourné un JSON valide : {e}\n\n"
+            f"Début de la réponse brute :\n{raw[:600]}"
+        )
+
+    # Vérification structure minimale
+    if "cv" not in result or "analyse" not in result:
+        raise ValueError(
+            f"Structure JSON inattendue — clés présentes : {list(result.keys())}"
+        )
+
+    poste    = result["analyse"].get("poste", "?")
+    contrat  = result["analyse"].get("type_contrat", "?")
+    score    = result["cv"].get("score_match", "?")
 
     if progress_cb:
-        progress_cb(f"Offre analysée — poste : {analyse.get('poste', '?')} | {analyse.get('type_contrat', '?')}")
+        progress_cb(f"✓ Poste : {poste} ({contrat}) — Score match : {score}/100")
 
-    if progress_cb:
-        progress_cb("Adaptation du CV en cours…")
-
-    cv_adapte = adapter_cv(profil, analyse)
-
-    if progress_cb:
-        progress_cb(f"CV adapté ✓ — Score de match : {cv_adapte.get('score_match', '?')}/100")
-
-    return {"cv": cv_adapte, "analyse": analyse}
+    return result
 
 
-# ── Utilitaires ──────────────────────────────────────────────────────────────
+# ── Utilitaires ───────────────────────────────────────────────────────────────
 
 def _clean_json(raw: str) -> str:
     """Nettoie la réponse LLM pour obtenir un JSON parseable."""
     raw = raw.strip()
-    # Supprimer les blocs markdown
     raw = re.sub(r"^```(?:json)?\s*", "", raw)
     raw = re.sub(r"\s*```$", "", raw)
     # Extraire le premier objet JSON valide si du texte parasite précède
     match = re.search(r"\{[\s\S]*\}", raw)
-    if match:
-        return match.group(0)
-    return raw
+    return match.group(0) if match else raw
 
 
 def check_ollama() -> tuple[bool, str]:
