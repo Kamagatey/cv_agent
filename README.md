@@ -1,6 +1,9 @@
 # CV Agent — Adaptateur de CV intelligent avec Ollama
 
-Agent local qui adapte automatiquement ton CV à chaque offre d'emploi.
+## Description
+
+Agent IA local qui adapte automatiquement ton CV à chaque offre d'emploi.
+Il s'agit de copier l'offre et un CV de référence ensuite l'agent adapte votre CV à l'offre et génére le PDF
 
 ## Stack
 - **Ollama** (qwen2.5:14b) — LLM local
